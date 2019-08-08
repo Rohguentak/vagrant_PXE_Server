@@ -37,7 +37,7 @@ Vagrant.configure("2") do |config|
   # Create a public network, which generally matched to bridged network.
   # Bridged networks make the machine appear as another physical device on
   # your network.
-  config.vm.network "public_network", ip: "192.168.0.3", bridge: "asdf"
+  config.vm.network "public_network", ip: "192.168.0.3", bridge: "choose"
 
   # Share an additional folder to the guest VM. The first argument is
   # the path on the host to the actual folder. The second argument is
@@ -79,15 +79,15 @@ Vagrant.configure("2") do |config|
     mkdir /var/nfs/
     exportfs -a
     # Set up required files
-    cp -v /vagrant/bootfiles/* /var/lib/tftpboot
+    cp -va /vagrant/bootfiles/* /var/lib/tftpboot
     mkdir /var/lib/tftpboot/pxelinux.cfg
     mkdir /var/lib/tftpboot/networkboot
     mount -o loop /vagrant/ubuntu-19-unattended.iso /mnt/
     cp -av /mnt/* /var/nfs/
-    cp /vagrant/preseed.cfg /var/www/html/preseed.cfg
-    cp /vagrant/post_install.sh /var/www/html/post_install.sh
-    cp /mnt/casper/initrd /var/lib/tftpboot/networkboot/
-    cp /mnt/casper/vmlinuz /var/lib/tftpboot/networkboot/
+    cp -av /vagrant/preseed.cfg /var/www/html/preseed.cfg
+    cp -av /vagrant/post_install.sh /var/www/html/post_install.sh
+    cp -av /mnt/casper/initrd /var/lib/tftpboot/networkboot/
+    cp -av /mnt/casper/vmlinuz /var/lib/tftpboot/networkboot/
     umount /mnt/
     # Edit bootparam file
     echo -ne "default menu.c32\nprompt 0\ntimeout 30\nMENU TITLE PXE Menu\nLABEL ubuntu-19.04\nMENU LABEL Ubuntu-19.04\nKERNEL /networkboot/vmlinuz\nAPPEND url=http://192.168.0.3/preseed.cfg auto=true priority=critical debian-installer/locale=en_US keyboard-configuration/layoutcode=es languagechooser/language-name=English countrychooser/shortlist=ES localechoose/supported-locales=en_US.UTF-8 boot=casper automatic-ubiquity netboot=nfs nfsroot=192.168.0.3:/var/nfs/ initrd=/networkboot/initrd \n" > /var/lib/tftpboot/pxelinux.cfg/default
