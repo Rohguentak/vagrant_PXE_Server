@@ -67,30 +67,43 @@ Vagrant.configure("2") do |config|
     # Update and install required packages
     yum update -y
     yum install -y vim dhcp tftp tftp-server syslinux vsftpd xinetd httpd nfs-utils
+  
     # Edit DHCP server configuration
     cp /vagrant/dhcpd.conf /etc/dhcp/dhcpd.conf
+    
     # Enable forwarding
     echo -ne "net.ipv4.ip_forward = 1\n" > /etc/sysctl.conf
     sysctl -p
+    
     # Enable tftp in xinetd
     echo -ne "service tftp\n{\n socket_type = dgram\n protocol    = udp\n wait        = yes\n user        = root\n server      = /usr/sbin/in.tftpd\n server_args = -s /var/lib/tftpboot\n disable     = no\n per_source  = 11\n cps         = 100 2\n flags       = IPv4\n}" > /etc/xinetd.d/tftp
+    
     # Export NFS directory
     echo -ne "/var/nfs  *(ro,sync,no_wdelay,insecure_locks,no_root_squash,insecure,no_subtree_check)" > /etc/exports
     mkdir /var/nfs/
     exportfs -a
     # Set up required files
+    #  -> TFTP files
     cp -va /vagrant/bootfiles/* /var/lib/tftpboot
     mkdir /var/lib/tftpboot/pxelinux.cfg
     mkdir /var/lib/tftpboot/networkboot
+    #  -> Mount ISO
     mount -o loop /vagrant/ubuntu-19-unattended.iso /mnt/
+    #  -> NFS files
     cp -av /mnt/* /var/nfs/
+    #  -> Web server files
     cp -av /vagrant/preseed.cfg /var/www/html/preseed.cfg
     cp -av /vagrant/post_install.sh /var/www/html/post_install.sh
+    chmod 644 -R /var/www/html/
+    #  -> Other TFTP files 
     cp -av /mnt/casper/initrd /var/lib/tftpboot/networkboot/
     cp -av /mnt/casper/vmlinuz /var/lib/tftpboot/networkboot/
+    #  -> Unmount
     umount /mnt/
+
     # Edit bootparam file
-    echo -ne "default menu.c32\nprompt 0\ntimeout 30\nMENU TITLE PXE Menu\nLABEL ubuntu-19.04\nMENU LABEL Ubuntu-19.04\nKERNEL /networkboot/vmlinuz\nAPPEND url=http://192.168.0.3/preseed.cfg auto=true priority=critical debian-installer/locale=en_US keyboard-configuration/layoutcode=es languagechooser/language-name=English countrychooser/shortlist=ES localechoose/supported-locales=en_US.UTF-8 boot=casper automatic-ubiquity netboot=nfs nfsroot=192.168.0.3:/var/nfs/ initrd=/networkboot/initrd \n" > /var/lib/tftpboot/pxelinux.cfg/default
+    echo -ne "default menu.c32\nprompt 0\ntimeout 30\nMENU TITLE PXE Menu\nLABEL ubuntu-19.04\nMENU LABEL Ubuntu-19.04\nKERNEL /networkboot/vmlinuz\nAPPEND url=http://192.168.0.3/preseed.cfg auto=true priority=critical boot=casper automatic-ubiquity netboot=nfs nfsroot=192.168.0.3:/var/nfs/ initrd=/networkboot/initrd \n" > /var/lib/tftpboot/pxelinux.cfg/default
+    
     # Start and enable services
     systemctl start xinetd
     systemctl enable xinetd
@@ -104,10 +117,12 @@ Vagrant.configure("2") do |config|
     systemctl enable httpd
     systemctl start nfs-server
     systemctl enable nfs-server
+    
     # SELinux required rules
     setsebool -P allow_ftpd_full_access 1
     #  -> Disable SELinux? (had issues with tftp boot)
     setenforce 0
+  
     # Firewall configuration
     #  -> Forwarding
     firewall-cmd --permanent --direct --passthrough ipv4 -t nat -I POSTROUTING -o eth0 -j MASQUERADE -s 192.168.0.0/24
@@ -118,6 +133,7 @@ Vagrant.configure("2") do |config|
     #firewall-cmd --add-port=69/tcp --permanent 
     #firewall-cmd --add-port=69/udp --permanent 
     #firewall-cmd --add-port=4011/udp --permanent
+    #  -> Reload firewall rules
     firewall-cmd --reload
     SHELL
 end
