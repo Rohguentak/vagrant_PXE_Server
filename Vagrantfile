@@ -106,6 +106,8 @@ Vagrant.configure("2") do |config|
     systemctl enable nfs-server
     # SELinux required rules
     setsebool -P allow_ftpd_full_access 1
+    #  -> Disable SELinux? (had issues with tftp boot)
+    setenforce 0
     # Firewall configuration
     #  -> Forwarding
     firewall-cmd --permanent --direct --passthrough ipv4 -t nat -I POSTROUTING -o eth0 -j MASQUERADE -s 192.168.0.0/24
