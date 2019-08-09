@@ -6,6 +6,8 @@ The purpose of this project is to be able to install an OS with PXE to multiple 
 
 In the following figure you can see our architecture better.
 
+![Image of architecture](https://github.com/UrkoLekuona/vagrant_PXE_Server/edit/master/vagrant_PXE_server.png)
+
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
