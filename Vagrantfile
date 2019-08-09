@@ -94,7 +94,8 @@ Vagrant.configure("2") do |config|
     #  -> Web server files
     cp -av /vagrant/preseed.cfg /var/www/html/preseed.cfg
     cp -av /vagrant/post_install.sh /var/www/html/post_install.sh
-    chmod 644 -R /var/www/html/
+    chown apache:apache -R /var/www/html/
+    chmod 755 -R /var/www/html/
     #  -> Other TFTP files 
     cp -av /mnt/casper/initrd /var/lib/tftpboot/networkboot/
     cp -av /mnt/casper/vmlinuz /var/lib/tftpboot/networkboot/
