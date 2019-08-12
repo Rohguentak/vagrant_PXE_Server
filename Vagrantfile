@@ -94,6 +94,7 @@ Vagrant.configure("2") do |config|
     #  -> Web server files
     cp -av /vagrant/preseed.cfg /var/www/html/preseed.cfg
     cp -av /vagrant/post_install.sh /var/www/html/post_install.sh
+    cp -av /vagrant/ks.cfg /var/www/html/ks.cfg
     chown apache:apache -R /var/www/html/
     chmod 755 -R /var/www/html/
     #  -> Other TFTP files 
@@ -103,8 +104,8 @@ Vagrant.configure("2") do |config|
     umount /mnt/
 
     # Edit bootparam file
-    echo -ne "default menu.c32\nprompt 0\ntimeout 30\nMENU TITLE PXE Menu\nLABEL ubuntu-19.04\nMENU LABEL Ubuntu-19.04\nKERNEL /networkboot/vmlinuz\nAPPEND url=http://192.168.0.3/preseed.cfg auto=true priority=critical boot=casper automatic-ubiquity netboot=nfs nfsroot=192.168.0.3:/var/nfs/ initrd=/networkboot/initrd \n" > /var/lib/tftpboot/pxelinux.cfg/default
-    
+    cp -va /vagrant/default /var/lib/tftpboot/pxelinux.cfg/default   
+ 
     # Start and enable services
     systemctl start xinetd
     systemctl enable xinetd

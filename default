@@ -1,0 +1,8 @@
+default menu.c32
+prompt 0
+timeout 30
+MENU TITLE PXE Menu
+LABEL ubuntu-19.04
+MENU LABEL Ubuntu-19.04
+KERNEL /networkboot/vmlinuz
+APPEND auto=true priority=critical boot=casper initrd=/networkboot/initrd ks=http://192.168.0.3/ks.cfg
