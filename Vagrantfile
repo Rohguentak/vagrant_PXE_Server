@@ -90,6 +90,7 @@ Vagrant.configure("2") do |config|
     #  -> Web server files
     cp -av /vagrant/preseed.cfg /var/www/html/preseed.cfg
     cp -av /vagrant/post_install.sh /var/www/html/post_install.sh
+    cp -av /vagrant/manual_config.sh /var/www/html/manual_config.sh
     chown apache:apache -R /var/www/html/
     chmod 755 -R /var/www/html/
 

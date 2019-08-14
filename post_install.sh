@@ -9,21 +9,22 @@ LOG=/root/postinstall.log
 # Updates and new packages
 apt-get update 2>> $LOG
 apt-get upgrade -y 2>> $LOG
-apt-get install -y vim dconf-cli 2>> $LOG
 apt-get autoremove 2>> $LOG
 
-# Locale
-dconf reset -f /org/gnome/terminal 2>> $LOG
-apt-get remove gnome-terminal -y 2>> $LOG
-apt-get install gnome-terminal -y 2>> $LOG
-locale-gen --purge en_US.UTF-8 2>> $LOG
-dpkg-reconfigure locales --default en_US.UTF-8 2>> $LOG
-update-locale 2>> $LOG
+# Configure display manager
+echo lightdm shared/default-x-display-manager select lightdm | debconf-set-selections 2>> $LOG
 
-# DHCP interfaces
-sed -i 's/manual/dhcp/g' /etc/network/interfaces 2>> $LOG
+# GRUB configuration
+sed -i 's/quiet//g' /etc/default/grub 2>> $LOG
+sed -i 's/splash//g' /etc/default/grub 2>> $LOG
+sed -i 's/GRUB_TIMEOUT=0/GRUB_TIMEOUT=5/g' /etc/default/grub 2>> $LOG
+update-grub 2>> $LOG
+
+# Download manual config script
+wget -O /root/manual_config.sh --tries=2 http://192.168.0.3/manual_config.sh
+chmod 750 /root/manual_config.sh
 
 # Testing if script has been executed
-if [ ! -f $LOG ]; then
+if [ ! -s $LOG ]; then
     echo "Post install script ended successfully" > $LOG
 fi
