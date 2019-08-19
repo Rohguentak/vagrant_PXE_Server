@@ -15,7 +15,7 @@ apt-get autoremove 2>> $LOG
 echo lightdm shared/default-x-display-manager select lightdm | debconf-set-selections 2>> $LOG
 
 # GRUB configuration
-sed -i 's/quiet//g' /etc/default/grub 2>> $LOG
+#sed -i 's/quiet//g' /etc/default/grub 2>> $LOG
 sed -i 's/splash//g' /etc/default/grub 2>> $LOG
 sed -i 's/GRUB_TIMEOUT=0/GRUB_TIMEOUT=5/g' /etc/default/grub 2>> $LOG
 update-grub 2>> $LOG

@@ -13,4 +13,4 @@ sed -i "s/127.0.1.1.*/127.0.1.1   $hostname/" /etc/hosts
 # Password
 echo "Type password for user 'investigator':"
 read -s password
-echo "$password\n$password" | passwd investigator
+echo "investigator:$password" | chpasswd
