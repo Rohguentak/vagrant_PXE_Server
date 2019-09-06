@@ -8,7 +8,11 @@ LOG=/root/postinstall.log
 
 # Updates and new packages
 apt-get update 2>> $LOG
+sleep 2
 apt-get upgrade -y 2>> $LOG
+sleep 2
+apt-get install lightdm vim
+sleep 2
 apt-get autoremove 2>> $LOG
 
 # Configure display manager
